@@ -1,0 +1,44 @@
+---
+
+- name: Install openvpn requirements (Debian)
+  apt: name={{item}}
+  with_items:
+    - openvpn
+    - udev
+    - openssl
+  when: ansible_os_family == 'Debian'
+
+- name: push configuration
+  copy: src={{ item }} dest=/etc/openvpn/ mode=0400
+  with_items: openvpn_config_files
+  notify:
+    - restart openvpn
+  when: openvpn_config_files is defined
+
+- name: push keys
+  copy: src={{ item }} dest=/etc/openvpn/keys/ mode=0400
+  with_items: openvpn_config_keys
+  notify:
+    - restart openvpn
+  when: openvpn_config_keys is defined
+
+- name: Create config for login/pass authenticated users
+  template: src=openvpn-user.ovpn dest=/etc/openvpn/openvpn-{{ item.u }}.{{ openvpnclient_ext }} mode=0400
+  with_items: openvpn_config_users
+  notify:
+    - restart openvpn
+  when: openvpn_config_users is defined
+
+- blockinfile:
+    dest: /etc/openvpn/keys/login-{{ item.u }}.txt
+    mode: 0400
+    create: yes
+#    marker: ''
+    block: |
+      {{ item.u }}
+      {{ item.p }}
+  with_items: openvpn_config_users
+  notify:
+    - restart openvpn
+  when: openvpn_config_users is defined
+

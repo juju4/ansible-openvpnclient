@@ -1,0 +1,15 @@
+---
+
+openvpnclient_ext: ovpn
+#openvpnclient_ext: conf
+
+#openvpn_config_users:
+#    - { server: '', port: 1194, user: '', pass: '', ca: 'ca.crt', localport: 1234, openvpnclient_options: '' }
+
+#openvpn_config_files:
+#    - a1.conf
+#    - a2.conf
+#openvpn_config_keys:
+#    - ca.crt
+#    - a1.key
+
