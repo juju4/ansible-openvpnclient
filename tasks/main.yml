@@ -1,18 +1,39 @@
 ---
 
-- name: Install openvpn requirements (Debian)
+- name: apt | Install openvpn requirements
   apt: name={{item}}
   with_items:
     - openvpn
     - udev
     - openssl
-  when: ansible_os_family == 'Debian'
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: yum | Install openvpn requirements
+  yum: name={{item}}
+  with_items:
+    - openvpn
+    - udev
+    - openssl
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Alpine | Install openvpn requirements
+  apk: name={{item}}
+  with_items:
+    - openvpn
+    - udev
+    - openssl
+  when: ansible_os_family == "Alpine"
+- name: map local config to /etc/openvpn/openvpn.conf
+  file: "src=/etc/openvpn/{{ inventory_hostname }}.conf dest=/etc/openvpn/openvpn.conf mode=0644 state=link"
+  ignore_errors: true
+  when: ansible_os_family == "Alpine"
 
 - name: push configuration
   copy: src={{ item }} dest=/etc/openvpn/ mode=0400
   with_items: openvpn_config_files
   notify:
     - restart openvpn
+    - restart openvpn synology
   when: openvpn_config_files is defined
 
 - name: push keys
@@ -20,6 +41,7 @@
   with_items: openvpn_config_keys
   notify:
     - restart openvpn
+    - restart openvpn synology
   when: openvpn_config_keys is defined
 
 - name: Create config for login/pass authenticated users
@@ -27,6 +49,7 @@
   with_items: openvpn_config_users
   notify:
     - restart openvpn
+    - restart openvpn synology
   when: openvpn_config_users is defined
 
 - blockinfile:
@@ -40,5 +63,6 @@
   with_items: openvpn_config_users
   notify:
     - restart openvpn
+    - restart openvpn synology
   when: openvpn_config_users is defined
 

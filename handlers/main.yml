@@ -2,4 +2,9 @@
 
 - name: restart openvpn
   service: name=openvpn state=restarted
+  when: ansible_system == "Linux" and ansible_distribution != "NA"
+- name: openvpn restart synology
+  shell: "killall openvpn; /var/packages/VPNCenter/target/sbin/openvpn --daemon --cd /var/packages/VPNCenter/target/etc/openvpn --config {{ ansible_hostname|lower }}.conf"
+  when: ansible_system == "Linux" and ansible_cmdline['syno_hw_version'] is defined and ansible_cmdline['syno_hw_version'] != ""
+
 
