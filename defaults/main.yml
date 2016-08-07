@@ -3,6 +3,8 @@
 openvpnclient_ext: ovpn
 #openvpnclient_ext: conf
 
+openvpnclient_confdir: /etc/openvpn
+
 #openvpn_config_users:
 #    - { server: '', port: 1194, user: '', pass: '', ca: 'ca.crt', localport: 1234, openvpnclient_options: '' }
 
