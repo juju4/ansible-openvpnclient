@@ -18,9 +18,12 @@
     - udev
     - openssl
   when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
-- name: Redhat | Ensure services are enabled on boot.
-  service: name=openvpn enabled=yes
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+## FAILED! => {"changed": false, "failed": true, "msg": "Error when trying to enable openvpn: rc=1 Failed to execute operation: No such file or directory\n"}
+##      per vpn activation w systemd. see at EOF
+#- name: Redhat | Ensure services are enabled on boot.
+#  service: name=openvpn enabled=yes
+#  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - name: Alpine | Install openvpn requirements
   apk: name={{item}}
@@ -43,6 +46,7 @@
   notify:
     - restart openvpn
     - restart openvpn synology
+    - restart openvpn - systemd
     - openvpn restart - darwin
   when: openvpn_config_files is defined
 
@@ -52,6 +56,7 @@
   notify:
     - restart openvpn
     - restart openvpn synology
+    - restart openvpn - systemd
     - openvpn restart - darwin
   when: openvpn_config_keys is defined
 
@@ -61,6 +66,7 @@
   notify:
     - restart openvpn
     - restart openvpn synology
+    - restart openvpn - systemd
     - openvpn restart - darwin
   when: openvpn_config_users is defined
 
@@ -76,6 +82,7 @@
   notify:
     - restart openvpn
     - restart openvpn synology
+    - restart openvpn - systemd
     - openvpn restart - darwin
   when: openvpn_config_users is defined
 
@@ -90,4 +97,19 @@
 
 - name: Ensure services are enabled and started
   service: name=openvpn enabled=yes state=started
+
+## Not valid on bare system as there is no default config ...
+#- name: Ensure services are enabled and started - systemd
+### NOK
+### FAILED! => {"changed": false, "failed": true, "msg": "Error when trying to enable openvpn@HOST: rc=1 Failed to execute operation: Too many levels of symbolic links\n"}
+##  service: name="openvpn@{{ inventory_hostname }}" enabled=yes state=started
+### OK
+#  service: name="openvpn@{{ inventory_hostname }}" state=started
+#  when: ansible_system == "Linux" and ansible_service_mgr == 'systemd'
+
+- block:
+    - file: dest=/etc/aide/aide.conf.d state=directory mode=0755
+    - name: add additional aide HIDS configuration
+      copy: src=99_aide_local_openvpn dest=/etc/aide/aide.conf.d/99_aide_local_openvpn mode=0644
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
