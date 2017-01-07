@@ -6,7 +6,7 @@
     - openvpn
     - udev
     - openssl
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: ansible_os_family == 'Debian' or ansible_os_family == 'Kali'
 - name: apt | make openvpn autostart
   replace: dest=/etc/default/openvpn regexp="^#AUTOSTART=\"all\"" replace="AUTOSTART=\"all\""
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
@@ -97,6 +97,7 @@
 
 - name: Ensure services are enabled and started
   service: name=openvpn enabled=yes state=started
+  when: ansible_system == 'Linux'
 
 ## Not valid on bare system as there is no default config ...
 #- name: Ensure services are enabled and started - systemd

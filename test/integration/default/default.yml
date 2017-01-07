@@ -5,5 +5,5 @@
 #  vars:
 #    - a:
   roles:
-    - openvpnclient
+    - juju4.openvpnclient
 

@@ -1,3 +1,5 @@
 ## aide config for openvpn
-/etc/openvpn/ipp.txt$ VarTime
+#/etc/openvpn/ipp.txt$ VarTime
+#/etc/openvpn/ipp.txt$ InodeData+Checksums
+/etc/openvpn/ipp.txt$ InodeData
 /etc/openvpn/openvpn-status.log$ InodeData
