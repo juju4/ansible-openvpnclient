@@ -97,7 +97,7 @@
 
 - name: Ensure services are enabled and started
   service: name=openvpn enabled=yes state=started
-  when: ansible_system == 'Linux'
+  when: ansible_system == 'Linux' and ansible_distribution != 'Alpine'
 
 ## Not valid on bare system as there is no default config ...
 #- name: Ensure services are enabled and started - systemd

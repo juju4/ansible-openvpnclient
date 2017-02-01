@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/juju4/ansible-openvpnclient.svg?branch=master)](https://travis-ci.org/juju4/ansible-openvpnclient)
+[![Build Status - Master](https://travis-ci.org/juju4/ansible-openvpnclient.svg?branch=master)](https://travis-ci.org/juju4/ansible-openvpnclient)
+[![Build Status - Devel](https://travis-ci.org/juju4/ansible-openvpnclient.svg?branch=devel)](https://travis-ci.org/juju4/ansible-openvpnclient/branches)
 # OpenVPN client ansible role
 
 A simple ansible role to setup openvpn as client.
@@ -10,6 +11,7 @@ for example client of server Stouts.openvpn [https://github.com/Stouts/Stouts.op
 It was tested on the following versions:
  * 1.9
  * 2.0
+ * 2.2
 
 ### Operating systems
 
@@ -23,7 +25,7 @@ For example
 ```
 - host: all
   roles:
-    - openvpnclient
+    - juju4.openvpnclient
 ```
 
 ## Variables
@@ -50,13 +52,13 @@ This role has a travis basic test (for github), more advanced with kitchen and a
 
 Once you ensured all necessary roles are present, You can test with:
 ```
-$ cd /path/to/roles/openvpnclient
+$ cd /path/to/roles/juju4.openvpnclient
 $ kitchen verify
 $ kitchen login
 ```
 or
 ```
-$ cd /path/to/roles/openvpnclient/test/vagrant
+$ cd /path/to/roles/juju4.openvpnclient/test/vagrant
 $ vagrant up
 $ vagrant ssh
 ```
