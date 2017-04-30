@@ -1,0 +1,69 @@
+---
+- set_fact:
+    daemons:
+      - openvpn
+
+- name: ensure monit package is present
+  package:
+    name: monit
+    state: present
+  when: ansible_system == 'Linux'
+- name: ensure monit configuration subdir is present
+  file:
+    dest: "{{ monit_confdir }}"
+    state: directory
+    mode: '0755'
+
+- block:
+    - name: set monit configurations
+      template: "src={{ item }}-monit.j2 dest={{ monit_confdir }}/{{ item }} mode=0644 backup=yes"
+      with_items: "{{ daemons }}"
+      notify:
+        - restart monit
+    - block:
+        - name: Trusty+Jessie | enable monit
+          file: "src={{ monit_confdir }}/{{ item }} dest=/etc/monit/conf.d/{{ item }} state=link"
+          with_items: "{{ daemons }}"
+          notify:
+            - restart monit
+      when: ansible_distribution_release == 'trusty' or ansible_distribution_release == 'jessie'
+    - block:
+        - name: Xenial | enable monit
+          file: "src={{ monit_confdir }}/{{ item }} dest=/etc/monit/conf-enabled/{{ item }} state=link"
+          with_items: "{{ daemons }}"
+          notify:
+            - restart monit
+      when: ansible_distribution_release == 'xenial'
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- block:
+    - name: set monit configurations
+      template: "src={{ item }}-monit.j2 dest={{ monit_confdir }}/{{ item }} mode=0644 backup=yes"
+      with_items: "{{ daemons }}"
+      notify:
+        - restart monit
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: allow monit status/summary from localhost
+  replace: dest={{ monitrc }} regexp={{ item.re }} replace={{ item.rep }}
+  with_items:
+    - { re: '^# set httpd port 2812 and', rep: ' set httpd port 2812 and' }
+    - { re: '^#    \s*use address localhost', rep: '     use address localhost' }
+    - { re: '^#    \s*allow localhost', rep: '     allow localhost' }
+#    - { re: '^#     allow admin:monit', rep: '     allow admin:monit' }
+    - { re: '^#  include /etc/monit.d/*', rep: '  include /etc/monit.d/*' }
+  notify:
+    - restart monit
+    - restart monit - darwin
+
+- name: Linux | ensure monit service is enabled and started
+  service: name=monit state=started enabled=yes
+  when: ansible_system == 'Linux'
+- name: Darwin | ensure monit service is enabled and started
+  command: "launchctl load -w /Library/LaunchDaemons/org.macports.monit.plist"
+  ignore_errors: true
+  when: ansible_distribution == 'MacOSX'
+
+- meta: flush_handlers
+- include: "monit-checkmonitor.yml daemon={{ item }}"
+  with_items: "{{ daemons }}"

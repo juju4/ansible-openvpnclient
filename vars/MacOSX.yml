@@ -1,0 +1,4 @@
+---
+
+monitrc: /opt/local/etc/monitrc
+monit_confdir: /opt/local/etc/monit.d

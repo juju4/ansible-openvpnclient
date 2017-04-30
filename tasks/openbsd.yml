@@ -1,0 +1,7 @@
+---
+
+- name: OpenBSD | openvpn package
+  openbsd_pkg: name={{ item }} state=present
+  with_items:
+    - openvpn
+

@@ -20,4 +20,10 @@
     - launchctl load -w /Library/LaunchDaemons/org.macports.openvpn2.plist
   when: ansible_os_family == 'Darwin'
 
+- name: openvpn restart - openbsd
+  command: "{{ item }}"
+  with_items:
+    - rcctl stop openvpn
+    - rcctl start openvpn
+  when: ansible_system == 'OpenBSD'
 

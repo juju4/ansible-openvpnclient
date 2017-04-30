@@ -39,6 +39,8 @@
 
 - include: darwin.yml
   when: ansible_os_family == 'Darwin'
+- include: openbsd.yml
+  when: ansible_system == 'OpenBSD'
 
 - name: push configuration
   copy: "src={{ item }} dest={{ openvpnclient_confdir }}/ mode=0400"
@@ -48,6 +50,7 @@
     - restart openvpn synology
     - restart openvpn - systemd
     - openvpn restart - darwin
+    - openvpn restart - openbsd
   when: openvpn_config_files is defined
 
 - name: push keys
@@ -58,6 +61,7 @@
     - restart openvpn synology
     - restart openvpn - systemd
     - openvpn restart - darwin
+    - openvpn restart - openbsd
   when: openvpn_config_keys is defined
 
 - name: Create config for login/pass authenticated users
@@ -68,6 +72,7 @@
     - restart openvpn synology
     - restart openvpn - systemd
     - openvpn restart - darwin
+    - openvpn restart - openbsd
   when: openvpn_config_users is defined
 
 - blockinfile:
@@ -84,6 +89,7 @@
     - restart openvpn synology
     - restart openvpn - systemd
     - openvpn restart - darwin
+    - openvpn restart - openbsd
   when: openvpn_config_users is defined
 
 ## http://fedoraproject.org/wiki/Openvpn

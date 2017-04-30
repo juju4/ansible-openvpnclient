@@ -1,0 +1,30 @@
+## {{ ansible_managed }}
+check process openvpn
+  with pidfile "/var/run/openvpn/{{ inventory_hostname }}.pid"
+  group net
+  group openvpn
+{% if ansible_service_mgr == 'systemd' %}
+  start program = "/bin/systemctl start openvpn" with timeout 60 seconds
+  stop program  = "/bin/systemctl stop openvpn"
+{% else %}
+  start program = "/etc/init.d/openvpn start" with timeout 60 seconds
+  stop program  = "/etc/init.d/openvpn stop"
+{% endif %}
+  if cpu > 90% for 15 cycles then alert
+  if totalmem > 90% for 15 cycles then alert
+  if loadavg(15min) greater than 10 for 50 cycles then alert
+## server only
+#  if failed host localhost port 1194 type udp then restart 
+  if 5 restarts with 5 cycles then alert
+  depends on openvpn_binary
+
+check file openvpn_binary
+  with path /usr/sbin/openvpn
+  group openvpn
+  group net
+  if failed checksum then alert
+
+check file openvpn_conf with path /etc/openvpn/{{ inventory_hostname }}.ovpn
+  include /etc/monit/templates/rootrc
+  group openvpn
+  group net
