@@ -101,9 +101,13 @@
   register: out
 - debug: var=out
 
-- name: Ensure services are enabled and started
+- name: Ensure service openvpn are enabled and started
   service: name=openvpn enabled=yes state=started
-  when: ansible_system == 'Linux' and ansible_distribution != 'Alpine'
+  when: ansible_os_family == "Debian"
+- name: Ensure service openvpn@<config> are enabled and started
+  service: name=openvpn enabled=yes state=started
+  with_items: "{{ openvpnclient_services | default('localhost') }}"
+  when: ansible_os_family == "RedHat"
 
 ## Not valid on bare system as there is no default config ...
 #- name: Ensure services are enabled and started - systemd
