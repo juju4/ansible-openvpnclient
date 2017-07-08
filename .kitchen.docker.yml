@@ -26,6 +26,10 @@ platforms:
   - name: ubuntu-14.04
   - name: ubuntu-12.04
   - name: centos-7
+## systemd: still 'Failed to get D-Bus connection: Operation not permitted'
+#    driver:
+#      config:
+#        security.privileged: true
 ### epel mirror issue. see readme
 #  - name: centos-6
 ### Ansible 2.2+/cryptography: https://github.com/ansible/ansible/issues/276
@@ -33,7 +37,7 @@ platforms:
 #      ansible_version: 2.1.2.0
 ## tool chain kitchen and image need customization... nok currently
 #  - name: alpine-3.4
-  - name: alpine-3.6
+#  - name: alpine-3.6
 
 suites:
   - name: default

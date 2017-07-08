@@ -15,8 +15,8 @@ env:
     version: 14.04
   - distribution: ubuntu
     version: 12.04
-  - distribution: alpine
-    version: 3.6
+#  - distribution: alpine
+#    version: 3.6
 
 before_install:
   - env
