@@ -8,31 +8,44 @@ env:
     init: /sbin/init
     run_opts: ""
     suite: default
+    ansible_version: 2.4.0.0
   - distribution: centos
     version: 7
     init: /usr/lib/systemd/systemd
     run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
     suite: default
+    ansible_version: 2.4.0.0
   - distribution: ubuntu
     version: 16.04
     init: /lib/systemd/systemd
     run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
     suite: default
+    ansible_version: 2.4.0.0
   - distribution: ubuntu
     version: 14.04
     init: /sbin/init
     run_opts: ""
     suite: default
+    ansible_version: 2.4.0.0
   - distribution: ubuntu
     version: 12.04
     init: /sbin/init
     run_opts: ""
     suite: default
+    ansible_version: 2.4.0.0
   - distribution: alpine
     version: 3.6
     init: /sbin/init
     run_opts: ""
     suite: default
+    ansible_version: 2.4.0.0
+## past ansible versions
+  - distribution: ubuntu
+    version: 16.04
+    init: /lib/systemd/systemd
+    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
+    suite: default
+    ansible_version: 2.3.0.0
 
 services:
   - docker
@@ -54,6 +67,8 @@ script:
     # Run container in detached state
   - 'sudo docker run --detach --volume="${PWD%/*}":/etc/ansible/roles:ro ${run_opts} ${distribution}-${version}:ansible "${init}" > "${container_id}"'
 
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm pip install --upgrade pip'
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm pip install ansible==${ansible_version}'
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible --version'
 
   # Ansible syntax check.
