@@ -3,12 +3,13 @@
 sudo: required
 
 env:
-  - distribution: centos
-    version: 6
-    init: /sbin/init
-    run_opts: ""
-    suite: default
-    ansible_version: 2.4.0.0
+# ERROR: distutils.errors.DistutilsError: Could not find suitable distribution for Requirement.parse('cffi>=1.4.1')
+#  - distribution: centos
+#    version: 6
+#    init: /sbin/init
+#    run_opts: ""
+#    suite: default
+#    ansible_version: 2.4.0.0
   - distribution: centos
     version: 7
     init: /usr/lib/systemd/systemd
@@ -27,12 +28,13 @@ env:
     run_opts: ""
     suite: default
     ansible_version: 2.4.0.0
-  - distribution: ubuntu
-    version: 12.04
-    init: /sbin/init
-    run_opts: ""
-    suite: default
-    ansible_version: 2.4.0.0
+# ERROR: No distributions at all found for pip
+#  - distribution: ubuntu
+#    version: 12.04
+#    init: /sbin/init
+#    run_opts: ""
+#    suite: default
+#    ansible_version: 2.4.0.0
   - distribution: alpine
     version: 3.6
     init: /sbin/init
