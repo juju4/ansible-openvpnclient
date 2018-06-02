@@ -3,49 +3,57 @@
 sudo: required
 
 env:
-  - distribution: centos
-    version: 6
-    init: /sbin/init
-    run_opts: ""
-    suite: default
-    ansible_version: 2.4.0.0
+# ERROR: distutils.errors.DistutilsError: Could not find suitable distribution for Requirement.parse('cffi>=1.4.1')
+#  - distribution: centos
+#    version: 6
+#    init: /sbin/init
+#    run_opts: ""
+#    suite: default
+#    ansible_version: 2.4.0.0
   - distribution: centos
     version: 7
     init: /usr/lib/systemd/systemd
     run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
     suite: default
-    ansible_version: 2.4.0.0
+    ansible_version: 2.5.3.0
+  - distribution: ubuntu
+    version: 18.04
+    init: /lib/systemd/systemd
+    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
+    suite: default
+    ansible_version: 2.5.3.0
   - distribution: ubuntu
     version: 16.04
     init: /lib/systemd/systemd
     run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
     suite: default
-    ansible_version: 2.4.0.0
+    ansible_version: 2.5.3.0
   - distribution: ubuntu
     version: 14.04
     init: /sbin/init
     run_opts: ""
     suite: default
-    ansible_version: 2.4.0.0
-  - distribution: ubuntu
-    version: 12.04
-    init: /sbin/init
-    run_opts: ""
-    suite: default
-    ansible_version: 2.4.0.0
+    ansible_version: 2.5.3.0
+# ERROR: No distributions at all found for pip
+#  - distribution: ubuntu
+#    version: 12.04
+#    init: /sbin/init
+#    run_opts: ""
+#    suite: default
+#    ansible_version: 2.4.0.0
   - distribution: alpine
     version: 3.6
     init: /sbin/init
     run_opts: ""
     suite: default
-    ansible_version: 2.4.0.0
+    ansible_version: 2.5.3.0
 ## past ansible versions
   - distribution: ubuntu
     version: 16.04
     init: /lib/systemd/systemd
     run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
     suite: default
-    ansible_version: 2.3.0.0
+    ansible_version: 2.4.4.0
 
 services:
   - docker
