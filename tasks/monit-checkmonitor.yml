@@ -13,4 +13,3 @@
   when: "'unmonitor' in monitstatus.stdout"
   environment:
     PATH: /usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/local/bin
-

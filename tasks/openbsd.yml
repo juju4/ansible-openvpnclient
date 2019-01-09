@@ -1,7 +1,6 @@
 ---
 
 - name: OpenBSD | openvpn package
-  openbsd_pkg: name={{ item }} state=present
-  with_items:
-    - openvpn
-
+  openbsd_pkg: name=openvpn state=present
+  register: pkg_result
+  until: pkg_result is success

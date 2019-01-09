@@ -1,14 +1,17 @@
 ---
 
-- stat: path=/opt/local/var/macports
+- name: Check if macports is present
+  stat: path=/opt/local/var/macports
   register: macportsdir
 - name: Darwin | Macports openvpn package
-  macports: name={{ item }} state=present update_cache=yes
-  with_items:
-    - openvpn2
+  macports: name=openvpn2 state=present update_cache=yes
   when: macportsdir.stat.exists
 
 - name: fix launchd file
-  template: src=org.macports.openvpn2.plist.j2 dest=/Library/LaunchDaemons/org.macports.openvpn2.plist mode=0644 backup=yes
+  template:
+    src: org.macports.openvpn2.plist.j2
+    dest: /Library/LaunchDaemons/org.macports.openvpn2.plist
+    mode: '0644'
+    backup: yes
   notify:
     - openvpn restart - darwin
