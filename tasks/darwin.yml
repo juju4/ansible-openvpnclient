@@ -6,6 +6,8 @@
 - name: Darwin | Macports openvpn package
   macports: name=openvpn2 state=present update_cache=yes
   when: macportsdir.stat.exists
+  register: pkg_result
+  until: pkg_result is success
 
 - name: fix launchd file
   template:
