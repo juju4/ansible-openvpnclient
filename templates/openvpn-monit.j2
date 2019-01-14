@@ -1,4 +1,5 @@
-## {{ ansible_managed }}
+{{ ansible_managed | comment }}
+
 check process openvpn
   with pidfile "/var/run/openvpn/{{ inventory_hostname }}.pid"
   group net
