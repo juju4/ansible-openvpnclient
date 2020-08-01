@@ -1,11 +1,13 @@
 ---
 
 - name: apt | Install openvpn requirements
-  apt: name={{ item }} update_cache=yes
-  with_items:
+  apt:
+    name:
     - openvpn
     - udev
     - openssl
+    state: present
+    update_cache: yes
   when: ansible_os_family == 'Debian' or ansible_os_family == 'Kali'
   register: pkg_result
   until: pkg_result is success
@@ -17,11 +19,12 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: yum | Install openvpn requirements
-  yum: name={{ item }}
-  with_items:
+  yum:
+    name:
     - openvpn
     - udev
     - openssl
+    state: present
   when: ansible_os_family == "RedHat"
   register: pkg_result
   until: pkg_result is success
@@ -34,11 +37,12 @@
 #  when: ansible_os_family == "RedHat"
 
 - name: Alpine | Install openvpn requirements
-  apk: name={{ item }}
-  with_items:
+  apk:
+    name:
     - openvpn
     - udev
     - openssl
+    state: present
   when: ansible_os_family == "Alpine"
   register: pkg_result
   until: pkg_result is success
