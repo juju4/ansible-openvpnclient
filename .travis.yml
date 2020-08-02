@@ -1,98 +1,27 @@
 ---
-## from https://github.com/geerlingguy/ansible-role-apache/blob/master/.travis.yml
-sudo: required
+language: python
+services: docker
 
 env:
-  - distribution: centos
-    version: 8
-    init: /usr/lib/systemd/systemd
-    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
-    suite: default
-    ansible_version: 2.9.4.0
-  - distribution: centos
-    version: 7
-    init: /usr/lib/systemd/systemd
-    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
-    suite: default
-    ansible_version: 2.9.4.0
-  - distribution: ubuntu
-    version: 20.04
-    init: /lib/systemd/systemd
-    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
-    suite: default
-    ansible_version: 2.9.4.0
-  - distribution: ubuntu
-    version: 18.04
-    init: /lib/systemd/systemd
-    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
-    suite: default
-    ansible_version: 2.9.4.0
-  - distribution: ubuntu
-    version: 16.04
-    init: /lib/systemd/systemd
-    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
-    suite: default
-    ansible_version: 2.9.4.0
-  - distribution: alpine
-    version: 3.11
-    init: /sbin/init
-    run_opts: ""
-    suite: default
-    ansible_version: 2.9.4.0
-## past ansible versions
-  - distribution: ubuntu
-    version: 18.04
-    init: /lib/systemd/systemd
-    run_opts: "'--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro'"
-    suite: default
-    ansible_version: 2.8.8.0
+  global:
+    - MOLECULE_NO_LOG: "false"
+  matrix:
+    - MOLECULE_DISTRO: centos:8
+    - MOLECULE_DISTRO: centos:7
+    - MOLECULE_DISTRO: ubuntu:20.04
+    - MOLECULE_DISTRO: ubuntu:18.04
+    - MOLECULE_DISTRO: ubuntu:16.04
 
-services:
-  - docker
+install:
+  # Install test dependencies.
+  - pip install molecule docker ansible-lint flake8 testinfra
 
-before_install:
-  # - sudo apt-get update
-  # Pull container
-  - 'sudo docker pull ${distribution}:${version}'
-  - env
-  - pwd
-  - find -ls
-  - "[ -f get-dependencies.sh ] && sh -x get-dependencies.sh"
-  - cp test/travis/initctl_faker test/
-  # Customize container
-  - 'sudo docker build --rm=true --file=test/travis/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible test'
+before_script:
+  - cd ../ && mv ansible-openvpnclient juju4.openvpnclient
+  - cd juju4.openvpnclient
 
 script:
-  - container_id=$(mktemp)
-    # Run container in detached state
-  - 'sudo docker run --detach --volume="${PWD%/*}":/etc/ansible/roles:ro ${run_opts} ${distribution}-${version}:ansible "${init}" > "${container_id}"'
-
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm pip install --upgrade pip'
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm pip install ansible==${ansible_version}'
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible --version'
-
-  # Ansible syntax check.
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/juju4.openvpnclient/test/integration/${suite}/default.yml --syntax-check'
-
-  # Test role.
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/juju4.openvpnclient/test/integration/${suite}/default.yml -vv'
-
-  # Test role idempotence.
-  - >
-    sudo docker exec "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/juju4.openvpnclient/test/integration/${suite}/default.yml
-    | tee /tmp/idempotency.log
-    | grep -q 'changed=0.*failed=0'
-    && (echo 'Idempotence test: pass' && exit 0)
-    || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 1)
-
-after_failure:
-  # Check what happened on systemd systems.
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm systemctl -l --no-pager status openvpn.service'
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm journalctl -xe --no-pager'
-
-after_script:
-  # Clean up
-  - 'sudo docker stop "$(cat ${container_id})"'
+  - molecule test
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
