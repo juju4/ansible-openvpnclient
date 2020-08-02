@@ -1,6 +1,7 @@
 ---
 
-- set_fact:
+- name: Set facts
+  set_fact:
     daemons:
       - openvpn
 
