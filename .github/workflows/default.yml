@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          path: juju4.opevpnclient
+          path: juju4.openvpnclient
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -41,7 +41,7 @@ jobs:
         run: |
           pwd
           find -ls
-          cd $GITHUB_WORKSPACE/juju4.opevpnclient && molecule test
+          cd $GITHUB_WORKSPACE/juju4.openvpnclient && molecule test
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
