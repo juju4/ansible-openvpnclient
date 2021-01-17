@@ -1,5 +1,9 @@
 [![Build Status - Master](https://travis-ci.com/juju4/ansible-openvpnclient.svg?branch=master)](https://travis-ci.com/juju4/ansible-openvpnclient)
 [![Build Status - Devel](https://travis-ci.com/juju4/ansible-openvpnclient.svg?branch=devel)](https://travis-ci.com/juju4/ansible-openvpnclient/branches)
+
+[![Actions Status - Master](https://github.com/juju4/ansible-openvpnclient/workflows/AnsibleCI/badge.svg)](https://github.com/juju4/ansible-openvpnclient/actions?query=branch%3Amaster)
+[![Actions Status - Devel](https://github.com/juju4/ansible-openvpnclient/workflows/AnsibleCI/badge.svg?branch=devel)](https://github.com/juju4/ansible-openvpnclient/actions?query=branch%3Adevel)
+
 # OpenVPN client ansible role
 
 A simple ansible role to setup openvpn as client.
