@@ -3,9 +3,9 @@
 - name: apt | Install openvpn requirements
   apt:
     name:
-    - openvpn
-    - udev
-    - openssl
+      - openvpn
+      - udev
+      - openssl
     state: present
     update_cache: yes
   when: ansible_os_family == 'Debian' or ansible_os_family == 'Kali'
@@ -22,9 +22,9 @@
 - name: yum | Install openvpn requirements
   yum:
     name:
-    - openvpn
-    - udev
-    - openssl
+      - openvpn
+      - udev
+      - openssl
     state: present
   when: ansible_os_family == "RedHat"
   register: pkg_result
@@ -33,16 +33,16 @@
 ## FAILED! => {"changed": false, "failed": true, "msg": "Error when trying to enable openvpn: rc=1
 ##      Failed to execute operation: No such file or directory\n"}
 ##      per vpn activation w systemd. see at EOF
-#- name: Redhat | Ensure services are enabled on boot.
-#  service: name=openvpn enabled=yes
-#  when: ansible_os_family == "RedHat"
+# - name: Redhat | Ensure services are enabled on boot.
+#   service: name=openvpn enabled=yes
+#   when: ansible_os_family == "RedHat"
 
 - name: Alpine | Install openvpn requirements
   apk:
     name:
-    - openvpn
-    - udev
-    - openssl
+      - openvpn
+      - udev
+      - openssl
     state: present
   when: ansible_os_family == "Alpine"
   register: pkg_result
@@ -103,7 +103,7 @@
     dest: "{{ openvpnclient_confdir }}/keys/login-{{ item.u }}.txt"
     mode: 0400
     create: yes
-#    marker: ''
+    # marker: ''
     block: |
       {{ item.u }}
       {{ item.p }}
@@ -145,14 +145,14 @@
     )
 
 ## Not valid on bare system as there is no default config ...
-#- name: Ensure services are enabled and started - systemd
-### NOK
-### FAILED! => {"changed": false, "failed": true, "msg": "Error when trying to enable openvpn@HOST: rc=1
-##      Failed to execute operation: Too many levels of symbolic links\n"}
-##  service: name="openvpn@{{ inventory_hostname }}" enabled=yes state=started
-### OK
-#  service: name="openvpn@{{ inventory_hostname }}" state=started
-#  when: ansible_system == "Linux" and ansible_service_mgr == 'systemd'
+# - name: Ensure services are enabled and started - systemd
+#   ## NOK
+#   ## FAILED! => {"changed": false, "failed": true, "msg": "Error when trying to enable openvpn@HOST: rc=1
+#   #      Failed to execute operation: Too many levels of symbolic links\n"}
+#   # service: name="openvpn@{{ inventory_hostname }}" enabled=yes state=started
+#   ## OK
+#   service: name="openvpn@{{ inventory_hostname }}" state=started
+#   when: ansible_system == "Linux" and ansible_service_mgr == 'systemd'
 
 - block:
     - name: Ensure /etc/aide/aide.conf.d directory exists

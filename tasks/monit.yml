@@ -56,7 +56,7 @@
     - { re: '^# set httpd port 2812 and', rep: ' set httpd port 2812 and' }
     - { re: '^#    \s*use address localhost', rep: '     use address localhost' }
     - { re: '^#    \s*allow localhost', rep: '     allow localhost' }
-#    - { re: '^#     allow admin:monit', rep: '     allow admin:monit' }
+    # - { re: '^#     allow admin:monit', rep: '     allow admin:monit' }
     - { re: '^#  include /etc/monit.d/*', rep: '  include /etc/monit.d/*' }
   notify:
     - restart monit
