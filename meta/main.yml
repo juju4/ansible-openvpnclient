@@ -1,5 +1,6 @@
 ---
 galaxy_info:
+  role_name: openvpnclient
   author: juju4
   description: setup openvpn as client
   license: BSD
