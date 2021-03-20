@@ -70,6 +70,7 @@
   ignore_errors: true
   when: ansible_distribution == 'MacOSX'
 
-- meta: flush_handlers
+- name: Flush handlers
+  meta: flush_handlers
 - include: "monit-checkmonitor.yml daemon={{ item }}"
   with_items: "{{ daemons }}"

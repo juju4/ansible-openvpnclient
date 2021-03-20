@@ -127,7 +127,8 @@
     state: link
   when: systemd.stat.exists
   register: out
-- debug: var=out
+- name: Debug | symlink task
+  debug: var=out
 
 - name: Debian | Ensure service openvpn are enabled and started
   service: name=openvpn enabled=yes state=started
