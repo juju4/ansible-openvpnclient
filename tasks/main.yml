@@ -54,7 +54,6 @@
     mode: '0644'
     state: link
     force: yes
-  ignore_errors: true
   when: ansible_os_family == "Alpine"
 
 - include: darwin.yml

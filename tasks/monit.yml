@@ -67,7 +67,7 @@
   when: ansible_system == 'Linux'
 - name: Darwin | ensure monit service is enabled and started
   command: "launchctl load -w /Library/LaunchDaemons/org.macports.monit.plist"
-  ignore_errors: true
+  failed_when: false
   when: ansible_distribution == 'MacOSX'
 
 - name: Flush handlers

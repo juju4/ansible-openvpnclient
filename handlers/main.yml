@@ -5,7 +5,7 @@
   when: ansible_system == "Linux" and ansible_distribution != "NA"
   ## Alpine: \n * WARNING: You are dropping root privileges!\n * As such openvpn may not be able to change
   ## ip, routing\n * or DNS configuration.\n * WARNING: openvpn has started, but is inactive
-  ignore_errors: true
+  failed_when: false
 - name: restart openvpn - systemd
   service: name="openvpn@{{ inventory_hostname }}" state=restarted
   when: ansible_system == "Linux" and ansible_distribution != "NA" and ansible_service_mgr == 'systemd'
