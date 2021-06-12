@@ -6,7 +6,7 @@ set :backend, :exec
 describe service('openvpn'), :if => os[:family] == 'ubuntu' do
   it { should be_enabled   }
 #  it { should be_running   }
-end  
+end
 
 describe file('/usr/sbin/openvpn') do
   it { should be_executable }
