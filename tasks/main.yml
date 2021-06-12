@@ -141,7 +141,7 @@
   when: >
     ansible_os_family == "RedHat" and
     not (ansible_virtualization_type is defined and
-      (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
+      (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
     )
 
 ## Not valid on bare system as there is no default config ...
