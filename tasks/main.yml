@@ -122,8 +122,9 @@
 - name: symlink starting config - systemd only
   file:
     src: '/lib/systemd/system/openvpn@.service'
-    dest: "/etc/systemd/system/openvpn@{{ inventory_hostname }}.service"
+    dest: "/etc/systemd/system/openvpn@{{ item }}.service"
     state: link
+  with_items: "{{ openvpnclient_services | default('localhost') }}"
   when: systemd.stat.exists
   register: out
 - name: Debug | symlink task
