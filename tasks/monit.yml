@@ -1,37 +1,37 @@
 ---
 
 - name: Set facts
-  set_fact:
+  ansible.builtin.set_fact:
     daemons:
       - openvpn
 
 - name: ensure monit package is present
-  package:
+  ansible.builtin.package:
     name: monit
     state: present
   when: ansible_system == 'Linux'
 - name: ensure monit configuration subdir is present
-  file:
+  ansible.builtin.file:
     dest: "{{ monit_confdir }}"
     state: directory
     mode: '0755'
 
 - block:
     - name: set monit configurations
-      template: "src={{ item }}-monit.j2 dest={{ monit_confdir }}/{{ item }} mode=0644 backup=yes"
+      ansible.builtin.template: "src={{ item }}-monit.j2 dest={{ monit_confdir }}/{{ item }} mode=0644 backup=yes"
       with_items: "{{ daemons }}"
       notify:
         - restart monit
     - block:
         - name: Trusty+Jessie | enable monit
-          file: "src={{ monit_confdir }}/{{ item }} dest=/etc/monit/conf.d/{{ item }} state=link"
+          ansible.builtin.file: "src={{ monit_confdir }}/{{ item }} dest=/etc/monit/conf.d/{{ item }} state=link"
           with_items: "{{ daemons }}"
           notify:
             - restart monit
       when: ansible_distribution_release == 'trusty' or ansible_distribution_release == 'jessie'
     - block:
         - name: Xenial | enable monit
-          file: "src={{ monit_confdir }}/{{ item }} dest=/etc/monit/conf-enabled/{{ item }} state=link"
+          ansible.builtin.file: "src={{ monit_confdir }}/{{ item }} dest=/etc/monit/conf-enabled/{{ item }} state=link"
           with_items: "{{ daemons }}"
           notify:
             - restart monit
@@ -40,14 +40,14 @@
 
 - block:
     - name: set monit configurations
-      template: "src={{ item }}-monit.j2 dest={{ monit_confdir }}/{{ item }} mode=0644 backup=yes"
+      ansible.builtin.template: "src={{ item }}-monit.j2 dest={{ monit_confdir }}/{{ item }} mode=0644 backup=yes"
       with_items: "{{ daemons }}"
       notify:
         - restart monit
   when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - name: allow monit status/summary from localhost
-  replace:
+  ansible.builtin.replace:
     dest: "{{ monitrc }}"
     regexp: "{{ item.re }}"
     replace: "{{ item.rep }}"
@@ -63,15 +63,15 @@
     - restart monit - darwin
 
 - name: Linux | ensure monit service is enabled and started
-  service: name=monit state=started enabled=yes
+  ansible.builtin.service: name=monit state=started enabled=yes
   when: ansible_system == 'Linux'
 - name: Darwin | ensure monit service is enabled and started
-  command: "launchctl load -w /Library/LaunchDaemons/org.macports.monit.plist"
+  ansible.builtin.command: "launchctl load -w /Library/LaunchDaemons/org.macports.monit.plist"
   failed_when: false
   when: ansible_distribution == 'MacOSX'
 
 - name: Flush handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 - include_tasks: monit-checkmonitor.yml
   vars:
     daemon: "{{ item }}"

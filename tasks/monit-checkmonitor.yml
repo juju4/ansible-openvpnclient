@@ -1,7 +1,7 @@
 ---
 
 - name: check monit status
-  command: "monit status {{ daemon }}"
+  ansible.builtin.command: "monit status {{ daemon }}"
   register: monitstatus
   changed_when: false
   ignore_errors: true
@@ -9,7 +9,7 @@
     PATH: /usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/local/bin
 
 - name: force monitor of {{ daemon }}
-  command: "monit monitor {{ item }}"
+  ansible.builtin.command: "monit monitor {{ item }}"
   when: "'unmonitor' in monitstatus.stdout"
   environment:
     PATH: /usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/local/bin

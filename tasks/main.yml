@@ -1,7 +1,7 @@
 ---
 
 - name: apt | Install openvpn requirements
-  apt:
+  ansible.builtin.apt:
     name:
       - openvpn
       - udev
@@ -12,7 +12,7 @@
   register: pkg_result
   until: pkg_result is success
 - name: apt | make openvpn autostart
-  replace:
+  ansible.builtin.replace:
     dest: /etc/default/openvpn
     regexp: "^#AUTOSTART=\"all\""
     replace: "AUTOSTART=\"all\""
@@ -20,7 +20,7 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: yum | Install openvpn requirements
-  yum:
+  ansible.builtin.yum:
     name:
       - openvpn
       - udev
@@ -34,11 +34,11 @@
 ##      Failed to execute operation: No such file or directory\n"}
 ##      per vpn activation w systemd. see at EOF
 # - name: Redhat | Ensure services are enabled on boot.
-#   service: name=openvpn enabled=yes
+#   ansible.builtin.service: name=openvpn enabled=yes
 #   when: ansible_os_family == "RedHat"
 
 - name: Alpine | Install openvpn requirements
-  apk:
+  ansible.builtin.apk:
     name:
       - openvpn
       - udev
@@ -48,7 +48,7 @@
   register: pkg_result
   until: pkg_result is success
 - name: map local config to {{ openvpnclient_confdir }}/openvpn.conf
-  file:
+  ansible.builtin.file:
     src: "{{ openvpnclient_confdir }}/{{ inventory_hostname }}.conf"
     dest: "{{ openvpnclient_confdir }}/openvpn.conf"
     mode: '0644'
@@ -62,7 +62,7 @@
   when: ansible_system == 'OpenBSD'
 
 - name: push configuration
-  copy: "src={{ item }} dest={{ openvpnclient_confdir }}/ mode=0400"
+  ansible.builtin.copy: "src={{ item }} dest={{ openvpnclient_confdir }}/ mode=0400"
   with_items: "{{ openvpn_config_files }}"
   notify:
     - restart openvpn
@@ -73,7 +73,7 @@
   when: openvpn_config_files is defined
 
 - name: push keys
-  copy: "src={{ item }} dest={{ openvpnclient_confdir }}/keys/ mode=0400"
+  ansible.builtin.copy: "src={{ item }} dest={{ openvpnclient_confdir }}/keys/ mode=0400"
   with_items: "{{ openvpn_config_keys }}"
   notify:
     - restart openvpn
@@ -84,7 +84,7 @@
   when: openvpn_config_keys is defined
 
 - name: Create config for login/pass authenticated users
-  template:
+  ansible.builtin.template:
     src: openvpn-user.ovpn
     dest: "{{ openvpnclient_confdir }}/openvpn-{{ item.u }}.{{ openvpnclient_ext }}"
     mode: 0400
@@ -98,7 +98,7 @@
   when: openvpn_config_users is defined
 
 - name: Set openvpn keys files
-  blockinfile:
+  ansible.builtin.blockinfile:
     dest: "{{ openvpnclient_confdir }}/keys/login-{{ item.u }}.txt"
     mode: 0400
     create: yes
@@ -117,10 +117,10 @@
 
 ## http://fedoraproject.org/wiki/Openvpn
 - name: Check if /lib/systemd/system/openvpn@.service exists
-  stat: path='/lib/systemd/system/openvpn@.service'
+  ansible.builtin.stat: path='/lib/systemd/system/openvpn@.service'
   register: systemd
 - name: symlink starting config - systemd only
-  file:
+  ansible.builtin.file:
     src: '/lib/systemd/system/openvpn@.service'
     dest: "/etc/systemd/system/openvpn@{{ item }}.service"
     state: link
@@ -128,13 +128,13 @@
   when: systemd.stat.exists
   register: out
 - name: Debug | symlink task
-  debug: var=out
+  ansible.builtin.debug: var=out
 
 - name: Debian | Ensure service openvpn are enabled and started
-  service: name=openvpn enabled=yes state=started
+  ansible.builtin.service: name=openvpn enabled=yes state=started
   when: ansible_os_family == "Debian"
 - name: RedHat | Ensure service openvpn@<config> are enabled and started
-  service:
+  ansible.builtin.service:
     name: "openvpn-server@{{ item }}"
     enabled: yes
     state: started
@@ -157,7 +157,7 @@
 
 - block:
     - name: Ensure /etc/aide/aide.conf.d directory exists
-      file: dest=/etc/aide/aide.conf.d state=directory mode=0755
+      ansible.builtin.file: dest=/etc/aide/aide.conf.d state=directory mode=0755
     - name: add additional aide HIDS configuration
-      copy: src=99_aide_local_openvpn dest=/etc/aide/aide.conf.d/99_aide_local_openvpn mode=0644
+      ansible.builtin.copy: src=99_aide_local_openvpn dest=/etc/aide/aide.conf.d/99_aide_local_openvpn mode=0644
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
