@@ -155,7 +155,8 @@
 #   service: name="openvpn@{{ inventory_hostname }}" state=started
 #   when: ansible_system == "Linux" and ansible_service_mgr == 'systemd'
 
-- block:
+- name: Debian
+  block:
     - name: Ensure /etc/aide/aide.conf.d directory exists
       ansible.builtin.file: dest=/etc/aide/aide.conf.d state=directory mode=0755
     - name: add additional aide HIDS configuration

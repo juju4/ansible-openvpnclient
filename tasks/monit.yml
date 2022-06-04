@@ -16,20 +16,23 @@
     state: directory
     mode: '0755'
 
-- block:
+- name: Debian
+  block:
     - name: set monit configurations
       ansible.builtin.template: "src={{ item }}-monit.j2 dest={{ monit_confdir }}/{{ item }} mode=0644 backup=yes"
       with_items: "{{ daemons }}"
       notify:
         - restart monit
-    - block:
+    - name: Trusty, Jessie
+      block:
         - name: Trusty+Jessie | enable monit
           ansible.builtin.file: "src={{ monit_confdir }}/{{ item }} dest=/etc/monit/conf.d/{{ item }} state=link"
           with_items: "{{ daemons }}"
           notify:
             - restart monit
       when: ansible_distribution_release == 'trusty' or ansible_distribution_release == 'jessie'
-    - block:
+    - name: Xenial
+      block:
         - name: Xenial | enable monit
           ansible.builtin.file: "src={{ monit_confdir }}/{{ item }} dest=/etc/monit/conf-enabled/{{ item }} state=link"
           with_items: "{{ daemons }}"
@@ -38,7 +41,8 @@
       when: ansible_distribution_release == 'xenial'
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-- block:
+- name: RedHat
+  block:
     - name: set monit configurations
       ansible.builtin.template: "src={{ item }}-monit.j2 dest={{ monit_confdir }}/{{ item }} mode=0644 backup=yes"
       with_items: "{{ daemons }}"
