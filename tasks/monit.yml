@@ -23,22 +23,6 @@
       with_items: "{{ daemons }}"
       notify:
         - restart monit
-    - name: Trusty, Jessie
-      block:
-        - name: Trusty+Jessie | enable monit
-          ansible.builtin.file: "src={{ monit_confdir }}/{{ item }} dest=/etc/monit/conf.d/{{ item }} state=link"
-          with_items: "{{ daemons }}"
-          notify:
-            - restart monit
-      when: ansible_distribution_release == 'trusty' or ansible_distribution_release == 'jessie'
-    - name: Xenial
-      block:
-        - name: Xenial | enable monit
-          ansible.builtin.file: "src={{ monit_confdir }}/{{ item }} dest=/etc/monit/conf-enabled/{{ item }} state=link"
-          with_items: "{{ daemons }}"
-          notify:
-            - restart monit
-      when: ansible_distribution_release == 'xenial'
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: RedHat
