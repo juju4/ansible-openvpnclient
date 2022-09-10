@@ -9,11 +9,11 @@
   register: pkg_result
   until: pkg_result is success
 
-- name: fix launchd file
+- name: Fix launchd file
   ansible.builtin.template:
     src: org.macports.openvpn2.plist.j2
     dest: /Library/LaunchDaemons/org.macports.openvpn2.plist
     mode: '0644'
     backup: yes
   notify:
-    - openvpn restart - darwin
+    - Openvpn restart - darwin

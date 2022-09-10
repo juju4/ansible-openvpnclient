@@ -5,12 +5,12 @@
     daemons:
       - openvpn
 
-- name: ensure monit package is present
+- name: Ensure monit package is present
   ansible.builtin.package:
     name: monit
     state: present
   when: ansible_system == 'Linux'
-- name: ensure monit configuration subdir is present
+- name: Ensure monit configuration subdir is present
   ansible.builtin.file:
     dest: "{{ monit_confdir }}"
     state: directory
@@ -18,23 +18,23 @@
 
 - name: Debian
   block:
-    - name: set monit configurations
+    - name: Set monit configurations
       ansible.builtin.template: "src={{ item }}-monit.j2 dest={{ monit_confdir }}/{{ item }} mode=0644 backup=yes"
       with_items: "{{ daemons }}"
       notify:
-        - restart monit
+        - Restart monit
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: RedHat
   block:
-    - name: set monit configurations
+    - name: Set monit configurations
       ansible.builtin.template: "src={{ item }}-monit.j2 dest={{ monit_confdir }}/{{ item }} mode=0644 backup=yes"
       with_items: "{{ daemons }}"
       notify:
-        - restart monit
+        - Restart monit
   when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
-- name: allow monit status/summary from localhost
+- name: Allow monit status/summary from localhost
   ansible.builtin.replace:
     dest: "{{ monitrc }}"
     regexp: "{{ item.re }}"
@@ -47,8 +47,8 @@
     # - { re: '^#     allow admin:monit', rep: '     allow admin:monit' }
     - { re: '^#  include /etc/monit.d/*', rep: '  include /etc/monit.d/*' }
   notify:
-    - restart monit
-    - restart monit - darwin
+    - Restart monit
+    - Restart monit - darwin
 
 - name: Linux | ensure monit service is enabled and started
   ansible.builtin.service: name=monit state=started enabled=yes

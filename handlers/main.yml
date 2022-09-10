@@ -1,34 +1,34 @@
 ---
 
-- name: restart openvpn
+- name: Restart openvpn
   ansible.builtin.service: name=openvpn state=restarted
   when: ansible_system == "Linux" and ansible_distribution != "NA"
   ## Alpine: \n * WARNING: You are dropping root privileges!\n * As such openvpn may not be able to change
   ## ip, routing\n * or DNS configuration.\n * WARNING: openvpn has started, but is inactive
   failed_when: false
-- name: restart openvpn - systemd
+- name: Restart openvpn - systemd
   ansible.builtin.service:
     name: "openvpn@{{ inventory_hostname }}"
     state: restarted
   when: ansible_system == "Linux" and ansible_distribution != "NA" and ansible_service_mgr == 'systemd'
 
-- name: openvpn restart synology
+- name: Openvpn restart synology
   ansible.builtin.command: >
     killall openvpn;
     /var/packages/VPNCenter/target/sbin/openvpn --daemon
-        --cd /var/packages/VPNCenter/target/etc/openvpn --config {{ ansible_hostname|lower }}.conf
+        --cd /var/packages/VPNCenter/target/etc/openvpn --config {{ ansible_hostname | lower }}.conf
   when: >
     ansible_system == "Linux" and
     ansible_cmdline['syno_hw_version'] is defined and ansible_cmdline['syno_hw_version']
 
-- name: openvpn restart - darwin
+- name: Openvpn restart - darwin
   ansible.builtin.command: "{{ item }}"
   with_items:
     - launchctl unload -w /Library/LaunchDaemons/org.macports.openvpn2.plist
     - launchctl load -w /Library/LaunchDaemons/org.macports.openvpn2.plist
   when: ansible_os_family == 'Darwin'
 
-- name: openvpn restart - openbsd
+- name: Openvpn restart - openbsd
   ansible.builtin.command: "{{ item }}"
   with_items:
     - rcctl stop openvpn
