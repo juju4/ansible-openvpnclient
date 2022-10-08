@@ -1,10 +1,14 @@
 ---
 
 - name: Check if macports is present
-  ansible.builtin.stat: path=/opt/local/var/macports
+  ansible.builtin.stat:
+    path: /opt/local/var/macports
   register: macportsdir
 - name: Darwin | Macports openvpn package
-  macports: name=openvpn2 state=present update_cache=yes
+  community.general.macports:
+    name: openvpn2
+    state: present
+    update_cache: yes
   when: macportsdir.stat.exists
   register: pkg_result
   until: pkg_result is success

@@ -17,22 +17,30 @@
     mode: '0755'
 
 - name: Debian
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
   block:
     - name: Set monit configurations
-      ansible.builtin.template: "src={{ item }}-monit.j2 dest={{ monit_confdir }}/{{ item }} mode=0644 backup=yes"
+      ansible.builtin.template:
+        src: "{{ item }}-monit.j2"
+        dest: "{{ monit_confdir }}/{{ item }}"
+        mode: '0644'
+        backup: yes
       with_items: "{{ daemons }}"
       notify:
         - Restart monit
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: RedHat
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
   block:
     - name: Set monit configurations
-      ansible.builtin.template: "src={{ item }}-monit.j2 dest={{ monit_confdir }}/{{ item }} mode=0644 backup=yes"
+      ansible.builtin.template:
+        src: "{{ item }}-monit.j2"
+        dest: "{{ monit_confdir }}/{{ item }}"
+        mode: '0644'
+        backup: yes
       with_items: "{{ daemons }}"
       notify:
         - Restart monit
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - name: Allow monit status/summary from localhost
   ansible.builtin.replace:
@@ -51,7 +59,10 @@
     - Restart monit - darwin
 
 - name: Linux | ensure monit service is enabled and started
-  ansible.builtin.service: name=monit state=started enabled=yes
+  ansible.builtin.service:
+    name: monit
+    state: started
+    enabled: yes
   when: ansible_system == 'Linux'
 - name: Darwin | ensure monit service is enabled and started
   ansible.builtin.command: "launchctl load -w /Library/LaunchDaemons/org.macports.monit.plist"
@@ -60,7 +71,8 @@
 
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
-- include_tasks: monit-checkmonitor.yml
+- name: Include monit-checkmonitor
+  ansible.builtin.include_tasks: monit-checkmonitor.yml
   vars:
     daemon: "{{ item }}"
   with_items: "{{ daemons }}"

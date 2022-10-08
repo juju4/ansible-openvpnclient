@@ -1,6 +1,8 @@
 ---
 
 - name: OpenBSD | openvpn package
-  openbsd_pkg: name=openvpn state=present
+  community.general.openbsd_pkg:
+    name: openvpn
+    state: present
   register: pkg_result
   until: pkg_result is success

@@ -38,7 +38,7 @@
 #   when: ansible_os_family == "RedHat"
 
 - name: Alpine | Install openvpn requirements
-  ansible.builtin.apk:
+  community.general.apk:
     name:
       - openvpn
       - udev
@@ -47,7 +47,7 @@
   when: ansible_os_family == "Alpine"
   register: pkg_result
   until: pkg_result is success
-- name: Map local config to {{ openvpnclient_confdir }}/openvpn.conf
+- name: Map local config to {{ openvpnclient_confdir }}
   ansible.builtin.file:
     src: "{{ openvpnclient_confdir }}/{{ inventory_hostname }}.conf"
     dest: "{{ openvpnclient_confdir }}/openvpn.conf"
@@ -56,13 +56,18 @@
     force: yes
   when: ansible_os_family == "Alpine"
 
-- import_tasks: darwin.yml
+- name: Import darwin
+  ansible.builtin.import_tasks: darwin.yml
   when: ansible_os_family == 'Darwin'
-- import_tasks: openbsd.yml
+- name: Import openbsd
+  ansible.builtin.import_tasks: openbsd.yml
   when: ansible_system == 'OpenBSD'
 
 - name: Push configuration
-  ansible.builtin.copy: "src={{ item }} dest={{ openvpnclient_confdir }}/ mode=0400"
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ openvpnclient_confdir }}/"
+    mode: '0400'
   with_items: "{{ openvpn_config_files }}"
   notify:
     - Restart openvpn
@@ -73,7 +78,10 @@
   when: openvpn_config_files is defined
 
 - name: Push keys
-  ansible.builtin.copy: "src={{ item }} dest={{ openvpnclient_confdir }}/keys/ mode=0400"
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ openvpnclient_confdir }}/keys/"
+    mode: '0400'
   with_items: "{{ openvpn_config_keys }}"
   notify:
     - Restart openvpn
@@ -117,7 +125,8 @@
 
 ## http://fedoraproject.org/wiki/Openvpn
 - name: Check if /lib/systemd/system/openvpn@.service exists
-  ansible.builtin.stat: path='/lib/systemd/system/openvpn@.service'
+  ansible.builtin.stat:
+    path: '/lib/systemd/system/openvpn@.service'
   register: systemd
 - name: Symlink starting config - systemd only
   ansible.builtin.file:
@@ -128,10 +137,14 @@
   when: systemd.stat.exists
   register: out
 - name: Debug | symlink task
-  ansible.builtin.debug: var=out
+  ansible.builtin.debug:
+    var: out
 
 - name: Debian | Ensure service openvpn are enabled and started
-  ansible.builtin.service: name=openvpn enabled=yes state=started
+  ansible.builtin.service:
+    name: openvpn
+    enabled: yes
+    state: started
   when: ansible_os_family == "Debian"
 - name: RedHat | Ensure service openvpn@<config> are enabled and started
   ansible.builtin.service:
@@ -156,9 +169,15 @@
 #   when: ansible_system == "Linux" and ansible_service_mgr == 'systemd'
 
 - name: Debian
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
   block:
     - name: Ensure /etc/aide/aide.conf.d directory exists
-      ansible.builtin.file: dest=/etc/aide/aide.conf.d state=directory mode=0755
+      ansible.builtin.file:
+        dest: /etc/aide/aide.conf.d
+        state: directory
+        mode: '0755'
     - name: Add additional aide HIDS configuration
-      ansible.builtin.copy: src=99_aide_local_openvpn dest=/etc/aide/aide.conf.d/99_aide_local_openvpn mode=0644
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+      ansible.builtin.copy:
+        src: 99_aide_local_openvpn
+        dest: /etc/aide/aide.conf.d/99_aide_local_openvpn
+        mode: '0644'
