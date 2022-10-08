@@ -18,3 +18,5 @@ openvpnclient_services:
 # openvpn_config_keys:
 #   - ca.crt
 #   - a1.key
+
+is_container: false

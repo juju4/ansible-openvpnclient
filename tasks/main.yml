@@ -1,5 +1,13 @@
 ---
 
+- name: Set fact is_container
+  ansible.builtin.set_fact:
+    is_container: true
+  when: >
+    (ansible_virtualization_type is defined and
+      (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+    )
+
 - name: Debian | Install openvpn requirements
   ansible.builtin.apt:
     name:
@@ -153,10 +161,7 @@
     state: started
   with_items: "{{ openvpnclient_services | default('localhost') }}"
   when: >
-    ansible_os_family == "RedHat" and
-    not (ansible_virtualization_type is defined and
-      (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
-    )
+    ansible_os_family == "RedHat" and not is_container | bool
 
 ## Not valid on bare system as there is no default config ...
 # - name: Ensure services are enabled and started - systemd
