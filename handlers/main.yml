@@ -14,7 +14,7 @@
     state: restarted
   when: ansible_system == "Linux" and ansible_distribution != "NA" and ansible_service_mgr == 'systemd'
 
-- name: Openvpn restart synology
+- name: Restart openvpn synology
   ansible.builtin.command: >
     killall openvpn;
     /var/packages/VPNCenter/target/sbin/openvpn --daemon
