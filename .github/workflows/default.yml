@@ -73,7 +73,7 @@ jobs:
           find -ls
       - name: Galaxy dependencies
         run: |
-          cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE && ansible-galaxy collection install --timeout 120 --verbose -r molecule/default/requirements.yml
+          cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE && ansible-galaxy install --timeout 120 --verbose -r molecule/default/requirements.yml
         continue-on-error: true
       - name: run test
         run: |
