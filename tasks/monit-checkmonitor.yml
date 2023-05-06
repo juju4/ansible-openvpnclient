@@ -9,7 +9,8 @@
     PATH: /usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/local/bin
 
 - name: Force monitor of {{ daemon }}
-  ansible.builtin.command: "monit monitor {{ item }}"
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: "monit monitor {{ item }}"
   when: "'unmonitor' in monitstatus.stdout"
   environment:
     PATH: /usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/local/bin

@@ -65,7 +65,8 @@
     enabled: yes
   when: ansible_system == 'Linux'
 - name: Darwin | ensure monit service is enabled and started
-  ansible.builtin.command: "launchctl load -w /Library/LaunchDaemons/org.macports.monit.plist"
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: "launchctl load -w /Library/LaunchDaemons/org.macports.monit.plist"
   failed_when: false
   when: ansible_distribution == 'MacOSX'
 
