@@ -30,7 +30,7 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Redhat | Install openvpn requirements
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name:
       - openvpn
       - udev
