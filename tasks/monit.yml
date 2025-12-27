@@ -9,7 +9,7 @@
   ansible.builtin.package:
     name: monit
     state: present
-  when: ansible_system == 'Linux'
+  when: ansible_facts['system'] == 'Linux'
 - name: Ensure monit configuration subdir is present
   ansible.builtin.file:
     dest: "{{ monit_confdir }}"
@@ -17,7 +17,7 @@
     mode: '0755'
 
 - name: Debian
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: ansible_facts['distribution'] == 'Debian' or ansible_facts['distribution'] == 'Ubuntu'
   block:
     - name: Set monit configurations
       ansible.builtin.template:
@@ -30,7 +30,7 @@
         - Restart monit
 
 - name: RedHat
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_facts['os_family'] == "RedHat" or ansible_facts['distribution'] == 'CentOS' or ansible_facts['distribution'] == 'Red Hat Enterprise Linux'
   block:
     - name: Set monit configurations
       ansible.builtin.template:
@@ -63,12 +63,12 @@
     name: monit
     state: started
     enabled: yes
-  when: ansible_system == 'Linux'
+  when: ansible_facts['system'] == 'Linux'
 - name: Darwin | ensure monit service is enabled and started
   ansible.builtin.command:  # noqa no-changed-when
     cmd: "launchctl load -w /Library/LaunchDaemons/org.macports.monit.plist"
   failed_when: false
-  when: ansible_distribution == 'MacOSX'
+  when: ansible_facts['distribution'] == 'MacOSX'
 
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers

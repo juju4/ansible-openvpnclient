@@ -4,10 +4,10 @@
   ansible.builtin.set_fact:
     is_container: true
   when: >
-    (ansible_virtualization_type is defined and
-      (ansible_virtualization_type == "docker"
-       or ansible_virtualization_type == "containerd"
-       or ansible_virtualization_type == "container")
+    (ansible_facts['virtualization_type'] is defined and
+      (ansible_facts['virtualization_type'] == "docker"
+       or ansible_facts['virtualization_type'] == "containerd"
+       or ansible_facts['virtualization_type'] == "container")
     )
 
 - name: Debian | Install openvpn requirements
@@ -18,7 +18,7 @@
       - openssl
     state: present
     update_cache: yes
-  when: ansible_os_family == 'Debian' or ansible_os_family == 'Kali'
+  when: ansible_facts['os_family'] == 'Debian' or ansible_facts['os_family'] == 'Kali'
   register: pkg_result
   until: pkg_result is success
 - name: Debian | make openvpn autostart
@@ -27,7 +27,7 @@
     regexp: "^#AUTOSTART=\"all\""
     replace: "AUTOSTART=\"all\""
     mode: '0644'
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: ansible_facts['distribution'] == 'Debian' or ansible_facts['distribution'] == 'Ubuntu'
 
 - name: Redhat | Install openvpn requirements
   ansible.builtin.dnf:
@@ -36,7 +36,7 @@
       - udev
       - openssl
     state: present
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts['os_family'] == "RedHat"
   register: pkg_result
   until: pkg_result is success
 
@@ -45,7 +45,7 @@
 ##      per vpn activation w systemd. see at EOF
 # - name: Redhat | Ensure services are enabled on boot.
 #   ansible.builtin.service: name=openvpn enabled=yes
-#   when: ansible_os_family == "RedHat"
+#   when: ansible_facts['os_family'] == "RedHat"
 
 - name: Alpine | Install openvpn requirements
   community.general.apk:
@@ -54,7 +54,7 @@
       - udev
       - openssl
     state: present
-  when: ansible_os_family == "Alpine"
+  when: ansible_facts['os_family'] == "Alpine"
   register: pkg_result
   until: pkg_result is success
 - name: Map local config to {{ openvpnclient_confdir }}
@@ -64,14 +64,14 @@
     mode: '0644'
     state: link
     force: yes
-  when: ansible_os_family == "Alpine"
+  when: ansible_facts['os_family'] == "Alpine"
 
 - name: Import darwin
   ansible.builtin.import_tasks: darwin.yml
-  when: ansible_os_family == 'Darwin'
+  when: ansible_facts['os_family'] == 'Darwin'
 - name: Import openbsd
   ansible.builtin.import_tasks: openbsd.yml
-  when: ansible_system == 'OpenBSD'
+  when: ansible_facts['system'] == 'OpenBSD'
 
 - name: Push configuration
   ansible.builtin.copy:
@@ -155,7 +155,7 @@
     name: openvpn
     enabled: yes
     state: started
-  when: ansible_os_family == "Debian"
+  when: ansible_facts['os_family'] == "Debian"
 - name: RedHat | Ensure service openvpn@<config> are enabled and started
   ansible.builtin.service:
     name: "openvpn-server@{{ item }}"
@@ -163,7 +163,7 @@
     state: started
   with_items: "{{ openvpnclient_services | default('localhost') }}"
   when: >
-    ansible_os_family == "RedHat" and not is_container | bool
+    ansible_facts['os_family'] == "RedHat" and not is_container | bool
 
 ## Not valid on bare system as there is no default config ...
 # - name: Ensure services are enabled and started - systemd
@@ -173,10 +173,10 @@
 #   # service: name="openvpn@{{ inventory_hostname }}" enabled=yes state=started
 #   ## OK
 #   service: name="openvpn@{{ inventory_hostname }}" state=started
-#   when: ansible_system == "Linux" and ansible_service_mgr == 'systemd'
+#   when: ansible_facts['system'] == "Linux" and ansible_facts['service_mgr'] == 'systemd'
 
 - name: Debian
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: ansible_facts['distribution'] == 'Debian' or ansible_facts['distribution'] == 'Ubuntu'
   block:
     - name: Ensure /etc/aide/aide.conf.d directory exists
       ansible.builtin.file:
