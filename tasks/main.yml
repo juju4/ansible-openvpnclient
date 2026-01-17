@@ -155,15 +155,18 @@
     name: openvpn
     enabled: yes
     state: started
-  when: ansible_facts['os_family'] == "Debian"
+  when:
+    - ansible_facts['os_family'] == "Debian"
+    - not is_container | bool
 - name: RedHat | Ensure service openvpn@<config> are enabled and started
   ansible.builtin.service:
     name: "openvpn-server@{{ item }}"
     enabled: yes
     state: started
   with_items: "{{ openvpnclient_services | default('localhost') }}"
-  when: >
-    ansible_facts['os_family'] == "RedHat" and not is_container | bool
+  when:
+    - ansible_facts['os_family'] == "RedHat"
+    - not is_container | bool
 
 ## Not valid on bare system as there is no default config ...
 # - name: Ensure services are enabled and started - systemd
